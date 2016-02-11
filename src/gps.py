@@ -32,8 +32,11 @@ def main():
 	while not rospy.is_shutdown():
 		line = ser.readline()
 		if line.startswith('$GPGGA'):
-			fix = parse_gpgga(line)
-			pub.publish(fix)
+			try:
+				fix = parse_gpgga(line)
+				pub.publish(fix)
+			except:
+				print "Error in GPS processing"
 		rate.sleep()
 
 # kick it off

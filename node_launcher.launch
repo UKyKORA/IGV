@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="igvc" type="imu.py" name="imu_node" output="screen"></node>
+	<node pkg="igvc" type="gps.py" name="gps_node" output="screen"></node>
+	<node pkg="igvc" type="ros_master.py" name="control" output="screen"></node>
+</launch>

@@ -8,6 +8,7 @@ from Adafruit_BNO055 import BNO055
 PORT = '/dev/serial0'
 
 def main():
+        print '---- IMU ----'
 	pub = rospy.Publisher('imu', Imu, queue_size=10)
 	rospy.init_node('imu_node')
 	rate = rospy.Rate(40) # 40 Hz
@@ -29,6 +30,6 @@ def main():
 		pub.publish(imu)
 		rate.sleep()
 
-# kick it 
+# kick it
 if __name__ == "__main__":
 	main()
