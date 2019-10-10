@@ -1,0 +1,10 @@
+# IGVC
+This is the repository for the University of Kentucky IGVC team. The current target hardware is a Raspberry Pi 3 B+ with the Pi ROS image from [Ubiquity](https://downloads.ubiquityrobotics.com/).
+
+## Setup
+1. Ensure ROS is installed on the target hardware.
+2. `mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src`
+3. `git clone https://github.com/UKyKORA/IGV.git igvc`
+4. `cd ~/catkin_ws && catkin_make`
+
+If the target hardware does not have internet access, use SCP to transfer the repository files to the device.
