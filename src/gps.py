@@ -1,12 +1,10 @@
 #! /usr/bin/env python
 
-import rospy
+#import rospy
 import serial
 import time
 import sys
 
-DURATION = 5
-SPEED = -1023
 PORT = '/dev/ttyACM0'
 
 def set_speeds(ser, left, right):
@@ -23,18 +21,24 @@ def ramp(ser, initial, final):
 		time.sleep(DT)
 	set_speeds(ser, final[0], final[1])
 
+def parse_gpgga(line):
+	parts = line.split(',')
+	lat = parts[2]
+	lat_sign = (parts[3] == 'S') * -2 + 1
+	decimal_lat = float(lat[:2]) + float(lat[2:])/60
+	lon = parts[4]
+	lon_sign = (parts[5] == 'W') * -2 + 1
+	decimal_lon = float(lon[:3]) + float(lon[3:])/60
+	return (decimal_lat * lat_sign, decimal_lon * lon_sign)
+
 def main():
-	rospy.init_node('motor_ctrl_node')
-	print "\n\nSabertooth 2x32 Driver\n\n"
+#	rospy.init_node('gps_node')
 	ser = serial.Serial(PORT)
-	ramp(ser, (0,0), (SPEED, SPEED))
-	time.sleep(DURATION)
-	ramp(ser, (SPEED, SPEED), (0, 0))
-	time.sleep(5)
-	ramp(ser, (0,0), (-SPEED, -SPEED))
-	time.sleep(DURATION)
-	ramp(ser, (-SPEED, -SPEED), (0,0))
-	rospy.spin()
+	while True:
+		line = ser.readline()
+		if line.startswith('$GPGGA'):
+			print parse_gpgga(line)
+#	rospy.spin()
 
 # kick it off
 main()
