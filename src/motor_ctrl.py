@@ -21,8 +21,9 @@ def rps_to_motor_input(motor_speeds):
 	cm_per_km = 100000
 	sec_per_hr = 3600
 	max_input = 2048
+	motor_speeds_list = [motor_speeds.left_motor_speed, motor_speeds.right_motor_speed]
 	input_val = []
-	for angular_velocity in motor_speeds:
+	for angular_velocity in motor_speeds_list:
 		input_val.append((angular_velocity * (wheel_diameter_cm/2) * sec_per_hr * max_input) / (max_velocity_kph * cm_per_km))
 	return input_val
 
