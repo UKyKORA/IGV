@@ -4,7 +4,7 @@ import rospy
 import serial
 import time
 import sys
-from sensor_msgs.msgs import NavSatFix
+from sensor_msgs.msg import NavSatFix
 
 # NOTE: This will need changed depending on the actual GPS tty
 PORT = '/dev/ttyACM0'
@@ -37,4 +37,5 @@ def main():
 		rate.sleep()
 
 # kick it off
-main()
+if __name__ == "__main__":
+	main()
