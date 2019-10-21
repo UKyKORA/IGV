@@ -36,7 +36,9 @@ def main():
 				fix = parse_gpgga(line)
 				pub.publish(fix)
 			except:
-				print "Error in GPS processing"
+#				print "Error in GPS processing"
+				fix = NavSatFix()
+				pub.publish(fix)
 		rate.sleep()
 
 # kick it off
