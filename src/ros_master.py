@@ -5,9 +5,13 @@ import rospy
 from sensor_msgs.msg import NavSatFix
 from sensor_msgs.msg import Imu
 import message_filters
+from tf.transformations import euler_from_quaternion
+import math
 
 def callback(imu, fix):
-    print imu.orientation, fix.latitude, fix.longitude
+    heading, _, _ = euler_from_quaternion([imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z])
+    heading = heading / math.pi * 180.0
+    print heading, fix.latitude, fix.longitude
 
 def main():
     print "---- CONTROL ----"
