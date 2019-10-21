@@ -2,4 +2,5 @@
 	<node pkg="igvc" type="imu.py" name="imu_node" output="screen"></node>
 	<node pkg="igvc" type="gps.py" name="gps_node" output="screen"></node>
 	<node pkg="igvc" type="ros_master.py" name="control" output="screen"></node>
+	<node pkg="igvc" type="motor_ctrl.py" name="motor_ctrl_node" output="screen"></node>
 </launch>
