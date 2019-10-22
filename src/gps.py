@@ -1,10 +1,9 @@
 #! /usr/bin/env python
-
 import rospy
 import serial
 import time
 import sys
-from sensor_msgs.msgs import NavSatFix
+from sensor_msgs.msg import NavSatFix
 
 # NOTE: This will need changed depending on the actual GPS tty
 PORT = '/dev/ttyACM0'
@@ -32,9 +31,15 @@ def main():
 	while not rospy.is_shutdown():
 		line = ser.readline()
 		if line.startswith('$GPGGA'):
-			fix = parse_gpgga(line)
-			pub.publish(fix)
+			try:
+				fix = parse_gpgga(line)
+				pub.publish(fix)
+			except:
+#				print "Error in GPS processing"
+				fix = NavSatFix()
+				pub.publish(fix)
 		rate.sleep()
 
 # kick it off
-main()
+if __name__ == "__main__":
+	main()

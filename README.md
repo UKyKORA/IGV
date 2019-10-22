@@ -5,6 +5,8 @@ This is the repository for the University of Kentucky IGVC team. The current tar
 1. Ensure ROS is installed on the target hardware.
 2. `mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src`
 3. `git clone https://github.com/UKyKORA/IGV.git igvc`
-4. `cd ~/catkin_ws && catkin_make`
+4. `cd ~/catkin_ws && rosdep install --from-paths src --ignore_src`
+5. `cd ~/catkin_ws && catkin_make`
+6. `cd ~/catkin_ws/devel && source setup.sh && cd ..`
 
 If the target hardware does not have internet access, use SCP to transfer the repository files to the device.

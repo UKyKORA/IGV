@@ -1,13 +1,13 @@
 #! /usr/bin/env python
-
 import rospy
-from sensor_msgs.msgs import Imu
-from geometry_msgs.msgs import Quaternion
+from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Quaternion
 from Adafruit_BNO055 import BNO055
 
 PORT = '/dev/serial0'
 
 def main():
+        print '---- IMU ----'
 	pub = rospy.Publisher('imu', Imu, queue_size=10)
 	rospy.init_node('imu_node')
 	rate = rospy.Rate(40) # 40 Hz
@@ -29,5 +29,6 @@ def main():
 		pub.publish(imu)
 		rate.sleep()
 
-# kick it off
-main()
+# kick it
+if __name__ == "__main__":
+	main()
