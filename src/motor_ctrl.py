@@ -15,6 +15,9 @@ def set_speeds(ser, left, right):
 	#print 'Setting speeds ({0}, {1})'.format(int(left), int(right))
 	ser.write(str.encode('M1: {0}\r\nM2: {1}\r\n'.format(int(left), -int(right))))
 
+def shutdown_callback():
+	set_speeds(ser, 0, 0)
+
 def rps_to_motor_input(motor_speeds):
 	max_velocity_kph = 6.44
 	wheel_diameter_cm = 25.4
@@ -36,7 +39,7 @@ def motor_speed_callback(motor_speeds):
 def main():
 	rospy.init_node('motor_ctrl_node')
 	rospy.Subscriber("motor_speeds", motor_speeds, motor_speed_callback)
-
+	rospy.on_shutdown(shutdown_callback)
 	rospy.spin() # Keeps python from exiting while node is running
 
 if __name__ == '__main__':
