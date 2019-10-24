@@ -20,9 +20,11 @@ def callback(imu, fix):
     dlon = dest[1] - fix.longitude
     leftspeed = 0.0
     rightspeed = 0.0
-    if abs(dlat) > 0.001 or abs(dlon) > 0.001:
+    rospy.loginfo(rospy.get_caller_id() + ": %f, %f, %f, %f", fix.latitude, fix.longitude, dlat, dlon)
+    if abs(dlat) > 0.0001 or abs(dlon) > 0.0001:
         # do nav
-        desired_heading = math.atan2(dlat, dlon)
+        desired_heading = -math.atan2(dlat, dlon) + math.pi/2
+        rospy.loginfo(rospy.get_caller_id() + ": desired = %f, actual = %f", desired_heading / math.pi * 180.0, heading / math.pi * 180)
         dspeed = P*(desired_heading - heading)
         leftspeed = BASE_SPEED - dspeed
         rightspeed = BASE_SPEED + dspeed

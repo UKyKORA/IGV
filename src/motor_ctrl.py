@@ -8,7 +8,7 @@ import sys
 
 DURATION = 5
 SPEED = -1023
-PORT = '/dev/ttyACM1'
+PORT = '/dev/ttyACM0'
 ser = serial.Serial(PORT)
 
 def set_speeds(ser, left, right):

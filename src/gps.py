@@ -6,9 +6,10 @@ import sys
 from sensor_msgs.msg import NavSatFix
 
 # NOTE: This will need changed depending on the actual GPS tty
-PORT = '/dev/ttyACM0'
+PORT = '/dev/ttyACM1'
 
 def parse_gpgga(line):
+	rospy.loginfo(rospy.get_caller_id() + ": %s", line)
 	parts = line.split(',')
 	lat = parts[2]
 	decimal_lat = float(lat[:2]) + float(lat[2:])/60
@@ -36,6 +37,8 @@ def main():
 				pub.publish(fix)
 			except:
 #				print "Error in GPS processing"
+				rospy.loginfo(rospy.get_caller_id() + ": FAILED TO PROCESS GPS DATA")
+				#print e
 				fix = NavSatFix()
 				pub.publish(fix)
 		rate.sleep()
