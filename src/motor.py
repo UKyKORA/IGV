@@ -17,6 +17,7 @@ class MotorNode(object):
 		if self.cfg['active']:
 			self.ser = serial.Serial(self.cfg['port'])
 		rospy.Subscriber("motor_speeds", motor_speeds, self.motor_speed_callback)
+		rospy.on_shutdown(self.shutdown_callback)
 
 	def set_speeds(self, left, right):
 		if self.cfg['active']:
@@ -41,6 +42,9 @@ class MotorNode(object):
 		input_val = self.rps_to_motor_input(motor_speeds)
 		rospy.loginfo(rospy.get_caller_id() + ": To Driver - Left: %d, Right: %d", input_val[0], input_val[1])
 		self.set_speeds(input_val[0], input_val[1])
+
+	def shutdown_callback(self):
+		self.set_speeds(0, 0)
 
 def main():
 	MotorNode()
