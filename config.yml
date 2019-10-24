@@ -1,0 +1,25 @@
+gps_node:
+    port: /dev/ttyACM0
+    active: false
+    rate: 10
+    sim_data:
+        lat: 38.037515
+        lon: -84.505607
+imu_node:
+    port: /dev/serial0
+    active: false
+    rate: 40
+    sim_data:
+        heading: 28
+motor_node:
+    port: /dev/ttyACM1
+    active: false
+    wheel_diameter_cm: 25.4
+    max_velocity_kph: 6.44
+    max_driver_input: 2048
+control_node:
+    dest:
+        lat: 38.037402
+        lon: -84.504964
+    base_speed_rps: 2.0
+    
