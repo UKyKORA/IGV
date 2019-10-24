@@ -31,10 +31,10 @@ def main():
 
 	pub = rospy.Publisher('location', NavSatFix, queue_size=10)
 	rate = rospy.Rate(node_cfg['rate'])
+	fix = NavSatFix()
 	if node_cfg['active']:
 		ser = serial.Serial(node_cfg['port'])
 	while not rospy.is_shutdown():
-		fix = NavSatFix()
 		if node_cfg['active']:
 			line = ser.readline()
 			if line.startswith('$GPGGA'):
