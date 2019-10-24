@@ -7,7 +7,7 @@ gps_node:
         lon: -84.505607
 imu_node:
     port: /dev/serial0
-    active: false
+    active: true
     rate: 40
     sim_data:
         heading: 28
