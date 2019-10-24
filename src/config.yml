@@ -1,0 +1,20 @@
+gps_node:
+    port: /dev/ttyACM0
+    active: false
+    debug: true
+    rate: 10
+    sim_data:
+        lat: 38.037515
+        lon: -84.505607
+imu:
+    port: /dev/serial0
+    active: false
+    debug: true
+    rate: 40
+    sim_data:
+        heading: 28
+motor_ctrl:
+    port: /dev/ttyACM1
+    active: false
+    debug: true
+    rate: 40
