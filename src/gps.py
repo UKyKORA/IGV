@@ -23,11 +23,11 @@ def parse_gpgga(line):
 
 def main():
 	rospy.init_node('gps_node')
-	cfg = load_yaml_config('config.yml')
+	cfg = load_yaml_config('/home/ubuntu/catkin_ws/src/igvc/config.yml')
 	if cfg == None:
 		rospy.loginfo(rospy.get_caller_id() + ': Unable to load config file. Stopping.')
 		return
-	node_cfg = cfg[rospy.get_caller_id()]
+	node_cfg = cfg[rospy.get_caller_id()[1:]]
 
 	pub = rospy.Publisher('location', NavSatFix, queue_size=10)
 	rate = rospy.Rate(node_cfg['rate'])

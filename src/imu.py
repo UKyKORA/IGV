@@ -5,15 +5,16 @@ from geometry_msgs.msg import Quaternion
 from Adafruit_BNO055 import BNO055
 from config_loader import load_yaml_config
 from tf.transformations import quaternion_from_euler
+import math
 
 def main():
 	rospy.init_node('imu_node')
-	cfg = load_yaml_config('config.yml')
+	cfg = load_yaml_config('/home/ubuntu/catkin_ws/src/igvc/config.yml')
 	if cfg == None:
 		rospy.loginfo(rospy.get_caller_id() + ': Unable to load conifg. Halting.')
 		rospy.spin()
 
-	node_cfg = cfg[rospy.get_caller_id()]
+	node_cfg = cfg[rospy.get_caller_id()[1:]]
 
 	pub = rospy.Publisher('imu', Imu, queue_size=10)
 	rate = rospy.Rate(node_cfg['rate'])
@@ -28,14 +29,14 @@ def main():
 		imu = Imu()
 		if node_cfg['active']:
 			x,y,z,w = bno.read_quaternion()
-			imu.orientaiton.x = x
-			imu.orientaiton.y = y
-			imu.orientaiton.z = z
-			imu.orientaiton.w = w
+			imu.orientation.x = x
+			imu.orientation.y = y
+			imu.orientation.z = z
+			imu.orientation.w = w
 		else:
-			quat = quaternion_from_euler(0.0, 0.0, node_cfg['heading'])
+			quat = quaternion_from_euler(0.0, 0.0, node_cfg['sim_data']['heading'] / math.pi * 180)
 			imu.orientation.w = quat[0]
-			imu.orientaiton.x = quat[1]
+			imu.orientation.x = quat[1]
 			imu.orientation.y = quat[2]
 			imu.orientation.z = quat[3]
 

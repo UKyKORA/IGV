@@ -9,11 +9,11 @@ class MotorNode(object):
 	''' A ROS node to interface with the Sabertooth Motor Driver. '''
 	def __init__(self):
 		rospy.init_node('motor_node')
-		cfg = load_yaml_config('config.yml')
+		cfg = load_yaml_config('/home/ubuntu/catkin_ws/src/igvc/config.yml')
 		if cfg == None:
 			rospy.loginfo(rospy.get_caller_id() + ': Unable to load config. Halting.')
 			return
-		self.cfg = cfg[rospy.get_caller_id()]
+		self.cfg = cfg[rospy.get_caller_id()[1:]]
 		if self.cfg['active']:
 			self.ser = serial.Serial(self.cfg['port'])
 		rospy.Subscriber("motor_speeds", motor_speeds, self.motor_speed_callback)
