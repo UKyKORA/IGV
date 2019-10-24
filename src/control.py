@@ -29,7 +29,8 @@ class ControlNode(object):
         self.ts.registerCallback(self.sensor_callback)
 
     def sensor_callback(self, imu, fix):
-        heading, _, _ = euler_from_quaternion([imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z])
+        _, _, yaw = euler_from_quaternion([imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z])
+        heading = yaw
         dlat = self.dest[0] - fix.latitude
         dlon = self.dest[1] - fix.longitude
         leftspeed = 0.0

@@ -34,7 +34,7 @@ def main():
 			imu.orientation.z = z
 			imu.orientation.w = w
 		else:
-			quat = quaternion_from_euler(0.0, 0.0, node_cfg['sim_data']['heading'] / math.pi * 180)
+			quat = quaternion_from_euler(0.0, 0.0, node_cfg['sim_data']['heading'] / 180.0 * math.pi)
 			imu.orientation.w = quat[0]
 			imu.orientation.x = quat[1]
 			imu.orientation.y = quat[2]
