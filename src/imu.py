@@ -3,29 +3,42 @@ import rospy
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Quaternion
 from Adafruit_BNO055 import BNO055
-
-PORT = '/dev/serial0'
+from config_loader import load_yaml_config
+from tf.transformations import quaternion_from_euler
 
 def main():
-        print '---- IMU ----'
-	pub = rospy.Publisher('imu', Imu, queue_size=10)
 	rospy.init_node('imu_node')
-	rate = rospy.Rate(40) # 40 Hz
+	cfg = load_yaml_config('config.yml')
+	if cfg == None:
+		rospy.loginfo(rospy.get_caller_id() + ': Unable to load conifg. Halting.')
+		rospy.spin()
+
+	node_cfg = cfg[rospy.get_caller_id()]
+
+	pub = rospy.Publisher('imu', Imu, queue_size=10)
+	rate = rospy.Rate(node_cfg['rate'])
 
 	# initialize the BNO055 sensor
-	bno = BNO055.BNO055(serial_port=PORT, rst=22)
-	if not bno.begin():
-		raise RuntimeException('Unable to find BNO055!')
+	if node_cfg['active']:
+		bno = BNO055.BNO055(serial_port=node_cfg['port'], rst=22)
+		if not bno.begin():
+			raise RuntimeException('Unable to find BNO055!')
 
 	while not rospy.is_shutdown():
-		x,y,z,w = bno.read_quaternion()
 		imu = Imu()
-		quat = Quaternion()
-		quat.x = x
-		quat.y = y
-		quat.z = z
-		quat.w = w
-		imu.orientation = quat
+		if node_cfg['active']:
+			x,y,z,w = bno.read_quaternion()
+			imu.orientaiton.x = x
+			imu.orientaiton.y = y
+			imu.orientaiton.z = z
+			imu.orientaiton.w = w
+		else:
+			quat = quaternion_from_euler(0.0, 0.0, node_cfg['heading'])
+			imu.orientation.w = quat[0]
+			imu.orientaiton.x = quat[1]
+			imu.orientation.y = quat[2]
+			imu.orientation.z = quat[3]
+
 		pub.publish(imu)
 		rate.sleep()
 

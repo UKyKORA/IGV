@@ -8,39 +8,47 @@ import message_filters
 from tf.transformations import euler_from_quaternion
 import math
 from igvc.msg import motor_speeds
+from config_loader import load_yaml_config
 
-dest = (38.037402, -84.504964)
-P = -2.0 / math.pi
-BASE_SPEED = 2.0
-motor_pub = rospy.Publisher('motor_speeds', motor_speeds, queue_size=10)
+class ControlNode(object):
+    ''' Main control algorithm. '''
+    def __init__(self):
+        rospy.init_node('control_node')
+        cfg = load_yaml_config('config.yml')
+        if cfg == None:
+            rospy.loginfo(rospy.get_caller_id() + ': Unable to load config. Halting.')
+            return
+        self.cfg = cfg[rospy.get_caller_id()]
+        self.dest = (self.cfg['dest']['lat'], self.cfg['dest']['lon'])
+        self.base_speed_rps = self.cfg['base_speed_rps']
+        self.gain = -self.base_speed_rps / math.pi
+        self.motor_pub = rospy.Publisher('motor_speeds', motor_speeds, queue_size=10)
+        imu_sub = message_filters.Subscriber('imu', Imu)
+        gps_sub = message_filters.Subscriber('location', NavSatFix)
+        self.ts = message_filters.ApproximateTimeSynchronizer([imu_sub, gps_sub], 10, 0.1)
+        self.ts.registerCallback(self.sensor_callback)
 
-def callback(imu, fix):
-    heading, _, _ = euler_from_quaternion([imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z])
-    dlat = dest[0] - fix.latitude
-    dlon = dest[1] - fix.longitude
-    leftspeed = 0.0
-    rightspeed = 0.0
-    rospy.loginfo(rospy.get_caller_id() + ": %f, %f, %f, %f", fix.latitude, fix.longitude, dlat, dlon)
-    if abs(dlat) > 0.0001 or abs(dlon) > 0.0001:
-        # do nav
-        desired_heading = -math.atan2(dlat, dlon) + math.pi/2
-        rospy.loginfo(rospy.get_caller_id() + ": desired = %f, actual = %f", desired_heading / math.pi * 180.0, heading / math.pi * 180)
-        dspeed = P*(desired_heading - heading)
-        leftspeed = BASE_SPEED - dspeed
-        rightspeed = BASE_SPEED + dspeed
-        msg = motor_speeds()
-        msg.left_motor_speed = leftspeed
-        msg.right_motor_speed = rightspeed
-        motor_pub.publish(msg)
-        print msg
+    def sensor_callback(self, imu, fix):
+        heading, _, _ = euler_from_quaternion([imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z])
+        dlat = self.dest[0] - fix.latitude
+        dlon = self.dest[1] - fix.longitude
+        leftspeed = 0.0
+        rightspeed = 0.0
+        rospy.loginfo(rospy.get_caller_id() + ": heading = %f, lat = %f, lon = %f", heading / math.pi * 180, fix.latitude, fix.longitude)
+        if abs(dlat) > 0.0001 or abs(dlon) > 0.0001:
+            # do nav
+            desired_heading = -math.atan2(dlat, dlon) + math.pi/2
+            rospy.loginfo(rospy.get_caller_id() + ": desired_heading = %f", desired_heading / math.pi * 180.0)
+            dspeed = self.gain*(desired_heading - heading)
+            leftspeed = self.base_speed_rps - dspeed
+            rightspeed = self.base_speed_rps + dspeed
+            msg = motor_speeds()
+            msg.left_motor_speed = leftspeed
+            msg.right_motor_speed = rightspeed
+            self.motor_pub.publish(msg)
 
 def main():
-    print "---- CONTROL ----"
-    rospy.init_node('control')
-    imu_sub = message_filters.Subscriber('imu', Imu)
-    gps_sub = message_filters.Subscriber('location', NavSatFix)
-    ts = message_filters.ApproximateTimeSynchronizer([imu_sub, gps_sub], 10, 0.1)
-    ts.registerCallback(callback)
+    ControlNode()
     rospy.spin()
 
 if __name__ == '__main__':

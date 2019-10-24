@@ -4,7 +4,6 @@ import serial
 from sensor_msgs.msg import NavSatFix
 from config_loader import load_yaml_config
 
-
 def parse_gpgga(line):
 	''' Parses a GPGGA line of GPS data into an Imu message with latitude and longitude. '''
 	rospy.loginfo(rospy.get_caller_id() + ": %s", line)
@@ -28,11 +27,12 @@ def main():
 	if cfg == None:
 		rospy.loginfo(rospy.get_caller_id() + ': Unable to load config file. Stopping.')
 		return
-	node_cfg = cfg['gps_node']
+	node_cfg = cfg[rospy.get_caller_id()]
 
 	pub = rospy.Publisher('location', NavSatFix, queue_size=10)
 	rate = rospy.Rate(node_cfg['rate'])
-	ser = serial.Serial(node_cfg['port'])
+	if node_cfg['active']:
+		ser = serial.Serial(node_cfg['port'])
 	while not rospy.is_shutdown():
 		fix = NavSatFix()
 		if node_cfg['active']:
