@@ -1,14 +1,12 @@
 #! /usr/bin/env python
 import rospy
 import serial
-import time
-import sys
 from sensor_msgs.msg import NavSatFix
-
-# NOTE: This will need changed depending on the actual GPS tty
-PORT = '/dev/ttyACM0'
+from config_loader import load_yaml_config
 
 def parse_gpgga(line):
+	''' Parses a GPGGA line of GPS data into an Imu message with latitude and longitude. '''
+	rospy.loginfo(rospy.get_caller_id() + ": %s", line)
 	parts = line.split(',')
 	lat = parts[2]
 	decimal_lat = float(lat[:2]) + float(lat[2:])/60
@@ -24,20 +22,30 @@ def parse_gpgga(line):
 	return msg
 
 def main():
-	pub = rospy.Publisher('location', NavSatFix, queue_size=10)
 	rospy.init_node('gps_node')
-	rate = rospy.Rate(10) # 10Hz
-	ser = serial.Serial(PORT)
+	cfg = load_yaml_config('/home/ubuntu/catkin_ws/src/igvc/config.yml')
+	if cfg == None:
+		rospy.loginfo(rospy.get_caller_id() + ': Unable to load config file. Stopping.')
+		return
+	node_cfg = cfg[rospy.get_caller_id()[1:]]
+
+	pub = rospy.Publisher('location', NavSatFix, queue_size=10)
+	rate = rospy.Rate(node_cfg['rate'])
+	if node_cfg['active']:
+		ser = serial.Serial(node_cfg['port'])
 	while not rospy.is_shutdown():
-		line = ser.readline()
-		if line.startswith('$GPGGA'):
-			try:
-				fix = parse_gpgga(line)
-				pub.publish(fix)
-			except:
-#				print "Error in GPS processing"
-				fix = NavSatFix()
-				pub.publish(fix)
+		fix = NavSatFix()
+		if node_cfg['active']:
+			line = ser.readline()
+			if line.startswith('$GPGGA'):
+				try:
+					fix = parse_gpgga(line)
+				except:
+					rospy.loginfo(rospy.get_caller_id() + ": FAILED TO PROCESS GPS DATA")
+		else:
+			fix.latitude = node_cfg['sim_data']['lat']
+			fix.longitude = node_cfg['sim_data']['lon']
+		pub.publish(fix)
 		rate.sleep()
 
 # kick it off
