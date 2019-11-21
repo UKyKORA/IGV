@@ -1,6 +1,0 @@
-<launch>
-	<node pkg="igvc" type="imu.py" name="imu_node" output="screen"></node>
-	<node pkg="igvc" type="gps.py" name="gps_node" output="screen"></node>
-	<node pkg="igvc" type="control.py" name="control_node" output="screen"></node>
-	<node pkg="igvc" type="motor.py" name="motor_node" output="screen"></node>
-</launch>
