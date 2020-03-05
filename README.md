@@ -10,3 +10,7 @@ This is the repository for the University of Kentucky IGVC team. The current tar
 6. `cd ~/catkin_ws/devel && source setup.sh && cd ..`
 
 If the target hardware does not have internet access, use SCP to transfer the repository files to the device.
+
+## Software Architecture
+
+![Architecture Diagram](https://raw.githubusercontent.com/UKyKORA/IGV/7a88e70380e5dd59bf030a0e2a64b666a227b67a/sw_arch_Rev01.png)

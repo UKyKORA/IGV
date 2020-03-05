@@ -29,7 +29,7 @@ class ControlNode(object):
         self.ts.registerCallback(self.sensor_callback)
 
     def sensor_callback(self, imu, fix):
-        _, _, yaw = euler_from_quaternion([imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z])
+        yaw, _, _ = euler_from_quaternion([imu.orientation.w, imu.orientation.x, imu.orientation.y, imu.orientation.z])
         heading = yaw
         dlat = self.dest[0] - fix.latitude
         dlon = self.dest[1] - fix.longitude
@@ -40,7 +40,13 @@ class ControlNode(object):
             # do nav
             desired_heading = -math.atan2(dlat, dlon) + math.pi/2
             rospy.loginfo(rospy.get_caller_id() + ": desired_heading = %f", desired_heading / math.pi * 180.0)
-            dspeed = self.gain*(desired_heading - heading)
+            dheading = desired_heading - heading
+            if dheading > math.pi:
+                dheading = dheading - 2*math.pi
+            elif dheading < -math.pi:
+                dheading = 2*math.pi + dheading
+            rospy.loginfo(rospy.get_caller_id() + ': dheading = %1.2f', dheading / math.pi * 180)
+            dspeed = self.gain*(dheading)
             leftspeed = self.base_speed_rps - dspeed
             rightspeed = self.base_speed_rps + dspeed
             msg = motor_speeds()
